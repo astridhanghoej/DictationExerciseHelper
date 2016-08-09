@@ -1,0 +1,56 @@
+Pitch for Dictation Exercise Helper Shiny App
+========================================================
+author: Astrid
+date: August 2016
+autosize: true
+
+Purpose
+========================================================
+
+Machine learning algorithms can help automate tasks that are tedious, labour-intensive, boring and prone to failure by humans. One such task for me as a kid was dictation exercises. Adding to that, I wasn't very good at it (mainly because I found it to be extremely uninteresting). Therefore I've decided to make a Shiny App that I wish I had as a kid so I could skip dictation exercises and play more computer games (and code things!).
+
+One of the exercises in dictation was identifying verbs and nouns in text. Verbs and nouns are just two types of word classes - there are many others. So my task is to build and app that can identify all possible word classes in the English language.
+
+Natural Language Processing
+========================================================
+
+Natural language processing (NLP) is a research field in both computer science as well as computational lingustics. It centers around the interactions between computers and human (natural) languages.
+
+Typically language processing requires a lot of manual work in handcoding large data sets. In that way, machine learning offers some benefits in terms of being able to computerize labour-intensive tasks. The machine-learning paradigm of NLP uses learning algorithms to automatically learn rules that govern human languages - such as grammar, word classes etc. This is learned through the analysis of large bodies (corpora) of real-world text examples. Once algorithms have been learned on a corpora, they can be used on any similar kind of text of the same language. One such implementation is the OpenNLP library in R. It is based on Apache OpenNLP. The Apache Software Foundation writes:
+
+"The Apache OpenNLP library is a machine learning based toolkit for the processing of natural language text.
+
+It supports the most common NLP tasks, such as tokenization, sentence segmentation, part-of-speech tagging, named entity extraction, chunking, parsing, and coreference resolution. These tasks are usually required to build more advanced text processing services. OpenNLP also includes maximum entropy and perceptron based machine learning."
+
+For documentation please refer to: https://opennlp.apache.org/documentation.html
+
+How the app works part I
+========================================================
+
+The app takes two inputs:
+- Drop down input selecter
+- Free text input box
+
+It returns the word classes of the selected type in the string typed.
+
+On the next slide you can see the code it runs in server.R. Please note that all code comments have been removed to make sure the code fits on the slide. For in line documentation, please refer to the code on github.
+
+How the app works part II
+========================================================
+```{r}
+library("openNLP")
+library("NLP")
+library("reshape")
+library("dplyr")
+text<-as.String("The quick brown fox jumps over the lazy dog")
+select<-"DT"    
+anno2 <- annotate(text, list(Maxent_Sent_Token_Annotator(), Maxent_Word_Token_Annotator()))
+anno3word <- subset(annotate(text, Maxent_POS_Tag_Annotator(), anno2), type == "word")
+tags <- sapply(anno3word$features, `[[`, "POS")
+WordsClassified<-as.data.frame(1:length(sprintf("%s", tags)),)
+WordsClassified[,1]<-sprintf("%s", tags)
+WordsClassified[,2]<-sprintf("%s", text[anno3word])
+names(WordsClassified)<-c("class","word")
+PrintOutput<-WordsClassified%>%filter(class==select)%>%select(word)
+if(nrow(PrintOutput)==0){c("No such words in string")} else {PrintOutput}
+```
