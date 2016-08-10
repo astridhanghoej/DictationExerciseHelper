@@ -47,7 +47,7 @@ sidebarPanel(width = 9,
   
 ),
 mainPanel(width = 9,
-h3('Main Panel text'),
+h3('Output - word class and words identified'),
 fluidRow(column(3, verbatimTextOutput("select"))),
 fluidRow(column(3, verbatimTextOutput("text")))
 )
